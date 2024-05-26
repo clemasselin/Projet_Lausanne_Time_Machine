@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #map {
+            height: 930px;
+            width: 100%;
+        }
+        #checkboxContainer {
+            background-color: white;
+            padding: 10px;
+            max-height: 950px;
+            overflow-y: auto;
+            width: 250px;
+            position: absolute;
+            z-index: 100;
+        }
+        .dropdown {
+            margin-bottom: 10px;
+        }
+        .dropdown-title {
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .dropdown-content {
+            display: none;
+            margin-left: 15px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="checkboxContainer">
+        <div class="dropdown">
+            <div class="dropdown-title" onclick="toggleDropdown('lausanne1880')">Lausanne en 1880 &#9660;</div>
+            <div id="lausanne1880" class="dropdown-content">
+                <label><input type="checkbox" id="toggle1880Layer" onclick="toggleLayerVisibility('1880', this.checked)"> Afficher/Masquer toute la couche</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1880', 'residentiel', this.checked)"> Residentiel</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1880', 'commercial', this.checked)"> Commercial</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1880', 'industriel', this.checked)"> Industriel</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1880', 'agricole', this.checked)"> Agricole</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1880', 'autres', this.checked)"> Autres</label><br>
+                <label><input type="checkbox" id="toggleFondBerney1831Layer" onclick="toggleFondrenoveVisibility(this.checked)"> Cadastre renove 1880</label><br>
+            </div>
+        </div>
+        <div class="dropdown">
+            <div class="dropdown-title" onclick="toggleDropdown('lausanne1831')">Lausanne en 1831 &#9660;</div>
+            <div id="lausanne1831" class="dropdown-content">
+                <label><input type="checkbox" id="toggle1831Layer" onclick="toggleLayerVisibility('1831', this.checked)"> Afficher/Masquer toute la couche</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1831', 'residentiel', this.checked)"> Residentiel</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1831', 'commercial', this.checked)"> Commercial</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1831', 'industriel', this.checked)"> Industriel</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1831', 'agricole', this.checked)"> Agricole</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1831', 'autres', this.checked)"> Autres</label><br>
+                <label><input type="checkbox" id="toggleFondBerney1831Layer" onclick="toggleFondBerneyVisibility(this.checked)"> Cadastre Berney 1831</label><br>
+            </div>
+        </div>
+    </div>
+
+    <div id="mapToggleButton" onclick="toggleMap()">Carte</div>
+    <div id="map"></div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7-dKbSp7eLdzipxpKoBhet8or-ls048U&callback=initMap" async defer></script>
+    <script>
+        var map;
+        var selectionRenoveLayer, fondBerneyLayer;
+        var categories1880 = {
+            'residentiel': [
+                'maison', 'logements', 'habitation', "maison d'habitation", 'logement', 'chambres', 'maison pour habitation'
+            ],
+            'commercial': [
+                'magasin', 'boutique', 'café', 'hôtel', 'magasins', 'basserie, magasins', 'fabrique de chocolat', 'pharmacie', 
+                'boulangerie', 'fabrique de bougies', 'huilerie', 'distellerie', 'tri perie', 'remise de roue hydraulique', 
+                'gare, pavillon pour occident', 'gare, pavillon pour orient', 'glacière', 'halle au poissons', 'atelier de photographie', 
+                'pinte', 'buffet', 'abattoir', 'entrepôt', 'galerie'
+            ],
+            'industriel': [
+                'atelier', 'usine', 'fabrique', 'moulin', 'atelier de serrurier, bureau', 'atelier de marbrerie (vodoz)', 
+                'atelier de tonnelier', 'atelier de réparations', 'forge', 'machine à vapeur', 'moulins', 'fabrique de produits stéariques', 
+                'scierie, écurie, chambre, bureau et hangar', 'séchoir', 'chaudière à vapeur', 'hangar, presse à déchets',
+                'machine é vapeur', 'ateliers de rivière, rodières, mises en huile, mag', 'moulin, machine à vapeur, fours',
+                'scierie à vapeur', 'réduit, bûcher', 'magasin des graisses, réduit', 'remise, dépôt, magasin', 'réduit',
+                'chambres, couvert', 'réduit, dépôt', 'bureaux, dépôt de bois et charbon', 'réduit, bûcher', 'cabinet de vigne'
+            ],
+            'agricole': [
+                'grange', 'étable', 'grange, écurie', 'écurie, fenil', 'étable à porcs', 'écurie', 'logement, grange, écurie', 
+                'maison, grange, écurie', 'maison, écurie, fenil', 'porcherie, étable à porcs', 'poulailler', 'étable à porcs, remises', 
+                'étable à porcs, fenil'
+            ],
+            'autres': [
+                'bûcher', 'remise', 'cabinet', 'poulailler', 'latrines', 'logement, écurie, remise, fenil', 'caves, chambre', 'creux à chaux', 
+                'passage couvert', 'trempes, atelier de mécanicien, moulins, atelier d', 'vestiaire, réfectoire, chambre à lessive', 
+                'hangar', 'hangar à écorce, broyeur', 'latrines', 'latrines', 'cave', 'remise, chambre à lessive, écurie'
+            ]
+        };
+        
+        var categories1831 = {
+            'residentiel': ['maison', 'maison, grange, écurie', 'maison, forge', 'maison, filature', 'maison, moulin', 
+                        'maison, imprimeur et libraire et éditeur, commissaire-arpenteur, Bureau de la Gazette de Lausanne', 
+                        'maison, épicier et laitier, courtepointière', 'maison, boulanger', 'maison, tripière', 'maison, gantier', 
+                        'maison, tanneur', 'maison, marchand', 'maison, cabinet', 'maison, galerie', 'maison, passage public', 
+                        'maison, cave', 'maison, grange, écurie, remise', 'maison | maison', 'logement, étable à porcs'],
+            'commercial': ['cordonnier', 'marchand et fripier, laitier, cordonnier', 'horloger, cordonnier', 'épicerie', 
+                        'commerce épicerie de toutes qualités et huiles et spiritueux, draperie', 'tailleur, fabrique eaux minérales et limonades gazeuses', 
+                        'cabaretier', 'buanderie', 'abattoir', 'boucherie', 'tannerie', 'hangar', 'tailleuse, fabricant de parapluies, traiteur, chapelier', 
+                        'fondeur', 'peinture', 'atelier', 'atelier, teinture', 'cabinet', 'marchande de soques (sabots)'],
+            'industriel': ['forge', 'moulin', 'atelier', 'scie', 'pressoir', 'serre', 'tannerie', 'atelier, teinture', 'moulin à écorce, place', 
+                        'teinture, bûcher', 'buanderie, étable à porcs', 'remise, distillerie'],
+            'agricole': ['moulin à écorce', 'grange, écurie', 'écurie, fenil', 'pré', 'étable à porcs', 'cave, bûcher'],
+            'autres': ['place', 'halle', 'place, escalier', 'foule, rouages', 'foule', 'moulin', 'cave', 'remise', 'carrier', 'étendage à molles', 
+                        'cave, maison, ruelle publique', 'étables à porcs, buanderie']
+        };
+        var visibility1880 = {
+            'residentiel': false,
+            'commercial': false,
+            'industriel': false,
+            'agricole': false,
+            'autres': false
+        };
+        var visibility1831 = {
+            'residentiel': false,
+            'commercial': false,
+            'industriel': false,
+            'agricole': false,
+            'autres': false
+        };
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: 46.5196, lng: 6.6323},
+                zoom: 15,
+                streetViewControl: false,
+                mapTypeControl: false,
+                styles: [{ "featureType": "poi", "elementType": "labels", "stylers": [{ "visibility": "off" }] }]
+            });
+
+            selectionRenoveLayer = new google.maps.Data({map: map});
+            selectionRenoveLayer.loadGeoJson('selection_renove.geojson');
+            selectionRenoveLayer.setStyle({visible: false});
+            updateLayerStyle(selectionRenoveLayer, '1880');
+            
+            fondrenove1880Layer = new google.maps.Data({map: map});
+            fondrenove1880Layer.loadGeoJson('fond_renove.geojson');
+            fondrenove1880Layer.setStyle({visible: false});
+
+            fondBerneyLayer = new google.maps.Data({map: map});
+            fondBerneyLayer.loadGeoJson('BERNEY_FINI_FINI.geojson');
+            fondBerneyLayer.setStyle({visible: false});
+            updateLayerStyle(fondBerneyLayer, '1831');
+
+            fondBerney1831Layer = new google.maps.Data({map: map});
+            fondBerney1831Layer.loadGeoJson('fond_berney.geojson');
+            fondBerney1831Layer.setStyle({visible: false});
+        }
+
+        function toggleLayerVisibility(year, isVisible) {
+            var layer = (year === '1880') ? selectionRenoveLayer : fondBerneyLayer;
+            var visibility = (year === '1880') ? visibility1880 : visibility1831;
+            Object.keys(visibility).forEach(function(group) {
+                visibility[group] = isVisible;
+            });
+            updateLayerStyle(layer, year);
+        }
+
+        function toggleGroupVisibility(year, group, isVisible) {
+            var visibility = (year === '1880') ? visibility1880 : visibility1831;
+            visibility[group] = isVisible;
+            var layer = (year === '1880') ? selectionRenoveLayer : fondBerneyLayer;
+            updateLayerStyle(layer, year);
+        }
+
+        function updateLayerStyle(layer, year) {
+            var visibility = (year === '1880') ? visibility1880 : visibility1831;
+            var categories = (year === '1880') ? categories1880 : categories1831;
+            layer.setStyle(function(feature) {
+                var fonction = feature.getProperty(year === '1880' ? 'Fonction' : 'use').toLowerCase();
+                var show = false;
+                var fillColor = 'grey'; // Default color
+
+                Object.keys(categories).forEach(function(category) {
+                    if (visibility[category] && categories[category].some(c => fonction.includes(c.toLowerCase()))) {
+                        show = true;
+                        fillColor = getColorForCategory(category); // Obtain color based on the category
+                    }
+                });
+
+                return {
+                    visible: show,
+                    fillColor: fillColor,
+                    strokeColor: fillColor,
+                    strokeWeight: 1,
+                    fillOpacity: 0.5,
+                    strokeOpacity: 0.5
+                };
+            });
+        }
+
+        function getColorForCategory(category) {
+            switch (category) {
+                case 'residentiel':
+                    return '#DA70D6'; // Pink for residential
+                case 'commercial':
+                    return '#FFD700'; // Yellow for commercial
+                case 'industriel':
+                    return '#4682B4'; // Blue for industrial
+                case 'agricole':
+                    return '#32CD32'; // Green for agricultural
+                case 'autres':
+                    return '#FF6347'; // Red for others
+                default:
+                    return 'grey'; // Default grey
+            }
+        }
+
+        function toggleDropdown(id) {
+            var content = document.getElementById(id);
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        function toggleFondBerneyVisibility(isVisible) {
+            fondBerney1831Layer.setStyle({visible: isVisible});
+        }
+        
+        function toggleFondrenoveVisibility(isVisible) {
+            fondrenove1880Layer.setStyle({visible: isVisible});
+        }
+
+    </script>
+</body>
+</html>
