@@ -27,7 +27,21 @@
             display: none;
             margin-left: 15px;
         }
-        
+        #legend {
+            background-color: white;
+            padding: 10px;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        #legend ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #legend li {
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -60,6 +74,16 @@
 
     <div id="mapToggleButton" onclick="toggleMap()">Carte</div>
     <div id="map"></div>
+    <div id="legend">
+        <strong>Legende :</strong>
+        <ul id="legend-content">
+            <li style="color: #DA70D6;">Residentiel</li>
+            <li style="color: #FFD700;">Commercial</li>
+            <li style="color: #4682B4;">Industriel</li>
+            <li style="color: #32CD32;">Agricole</li>
+            <li style="color: #FF6347;">Autres</li>
+        </ul>
+    </div>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7-dKbSp7eLdzipxpKoBhet8or-ls048U&callback=initMap" async defer></script>
     <script>
@@ -128,8 +152,8 @@
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
-                center: {lat: 46.5196, lng: 6.6323},
-                zoom: 15,
+                center: {lat: 46.52107369029354, lng: 6.634178147416838},
+                zoom: 17,
                 streetViewControl: false,
                 mapTypeControl: false,
                 styles: [{ "featureType": "poi", "elementType": "labels", "stylers": [{ "visibility": "off" }] }]
