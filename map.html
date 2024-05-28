@@ -37,13 +37,6 @@
             font-family: Arial, sans-serif;
             z-index: 1000;
         }
-        #legend ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        #legend li {
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
@@ -76,16 +69,16 @@
 
     <div id="mapToggleButton" onclick="toggleMap()">Carte</div>
     <div id="map"></div>
+
     <div id="legend">
-        <strong>Legende :</strong>
-        <ul id="legend-content">
-            <li style="color: #DA70D6;">Residentiel</li>
-            <li style="color: #FFD700;">Commercial</li>
-            <li style="color: #4682B4;">Industriel</li>
-            <li style="color: #32CD32;">Agricole</li>
-            <li style="color: #FF6347;">Autres</li>
-        </ul>
+        <h4>Legende :</h4>
+        <p><span style="display:inline-block; width: 12px; height: 12px; background-color: #DA70D6;"></span> Residentiel</p>
+        <p><span style="display:inline-block; width: 12px; height: 12px; background-color: #FFD700;"></span> Commercial</p>
+        <p><span style="display:inline-block; width: 12px; height: 12px; background-color: #4682B4;"></span> Industriel</p>
+        <p><span style="display:inline-block; width: 12px; height: 12px; background-color: #32CD32;"></span> Agricole</p>
+        <p><span style="display:inline-block; width: 12px; height: 12px; background-color: #FF6347;"></span> Autres</p>
     </div>
+    
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7-dKbSp7eLdzipxpKoBhet8or-ls048U&callback=initMap" async defer></script>
     <script>
