@@ -42,15 +42,15 @@
 <body>
     <div id="checkboxContainer">
         <div class="dropdown">
-            <div class="dropdown-title" onclick="toggleDropdown('lausanne1880')">Lausanne en 1880 &#9660;</div>
-            <div id="lausanne1880" class="dropdown-content">
-                <label><input type="checkbox" id="toggle1880Layer" onclick="toggleLayerVisibility('1880', this.checked)"> Afficher/Masquer toute la couche</label><br>
-                <label><input type="checkbox" onclick="toggleGroupVisibility('1880', 'residentiel', this.checked)"> Residentiel</label><br>
-                <label><input type="checkbox" onclick="toggleGroupVisibility('1880', 'commercial', this.checked)"> Commercial</label><br>
-                <label><input type="checkbox" onclick="toggleGroupVisibility('1880', 'industriel', this.checked)"> Industriel</label><br>
-                <label><input type="checkbox" onclick="toggleGroupVisibility('1880', 'agricole', this.checked)"> Agricole</label><br>
-                <label><input type="checkbox" onclick="toggleGroupVisibility('1880', 'autres', this.checked)"> Autres</label><br>
-                <label><input type="checkbox" id="toggleFondBerney1831Layer" onclick="toggleFondrenoveVisibility(this.checked)"> Cadastre renove 1880</label><br>
+            <div class="dropdown-title" onclick="toggleDropdown('lausanne1888')">Lausanne en 1888 &#9660;</div>
+            <div id="lausanne1888" class="dropdown-content">
+                <label><input type="checkbox" id="toggle1888Layer" onclick="toggleLayerVisibility('1888', this.checked)"> Afficher/Masquer toute la couche</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1888', 'residentiel', this.checked)"> Residentiel</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1888', 'commercial', this.checked)"> Commercial</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1888', 'industriel', this.checked)"> Industriel</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1888', 'agricole', this.checked)"> Agricole</label><br>
+                <label><input type="checkbox" onclick="toggleGroupVisibility('1888', 'autres', this.checked)"> Autres</label><br>
+                <label><input type="checkbox" id="toggleFondBerney1831Layer" onclick="toggleFondrenoveVisibility(this.checked)"> Cadastre renove 1888</label><br>
             </div>
         </div>
         <div class="dropdown">
@@ -84,7 +84,7 @@
     <script>
         var map;
         var selectionRenoveLayer, fondBerneyLayer;
-        var categories1880 = {
+        var categories1888 = {
             'residentiel': [
                 'maison', 'logements', 'habitation', "maison d'habitation", 'logement', 'chambres', 'maison pour habitation'
             ],
@@ -130,7 +130,7 @@
             'autres': ['place', 'halle', 'place, escalier', 'foule, rouages', 'foule', 'moulin', 'cave', 'remise', 'carrier', 'étendage à molles', 
                         'cave, maison, ruelle publique', 'étables à porcs, buanderie']
         };
-        var visibility1880 = {
+        var visibility1888 = {
             'residentiel': false,
             'commercial': false,
             'industriel': false,
@@ -157,11 +157,11 @@
             selectionRenoveLayer = new google.maps.Data({map: map});
             selectionRenoveLayer.loadGeoJson('selection_renove.geojson');
             selectionRenoveLayer.setStyle({visible: false});
-            updateLayerStyle(selectionRenoveLayer, '1880');
+            updateLayerStyle(selectionRenoveLayer, '1888');
             
-            fondrenove1880Layer = new google.maps.Data({map: map});
-            fondrenove1880Layer.loadGeoJson('fond_renove.geojson');
-            fondrenove1880Layer.setStyle({visible: false});
+            fondrenove1888Layer = new google.maps.Data({map: map});
+            fondrenove1888Layer.loadGeoJson('fond_renove.geojson');
+            fondrenove1888Layer.setStyle({visible: false});
 
             fondBerneyLayer = new google.maps.Data({map: map});
             fondBerneyLayer.loadGeoJson('BERNEY_FINI_FINI.geojson');
@@ -174,8 +174,8 @@
         }
 
         function toggleLayerVisibility(year, isVisible) {
-            var layer = (year === '1880') ? selectionRenoveLayer : fondBerneyLayer;
-            var visibility = (year === '1880') ? visibility1880 : visibility1831;
+            var layer = (year === '1888') ? selectionRenoveLayer : fondBerneyLayer;
+            var visibility = (year === '1888') ? visibility1888 : visibility1831;
             Object.keys(visibility).forEach(function(group) {
                 visibility[group] = isVisible;
             });
@@ -183,17 +183,17 @@
         }
 
         function toggleGroupVisibility(year, group, isVisible) {
-            var visibility = (year === '1880') ? visibility1880 : visibility1831;
+            var visibility = (year === '1888') ? visibility1888 : visibility1831;
             visibility[group] = isVisible;
-            var layer = (year === '1880') ? selectionRenoveLayer : fondBerneyLayer;
+            var layer = (year === '1888') ? selectionRenoveLayer : fondBerneyLayer;
             updateLayerStyle(layer, year);
         }
 
         function updateLayerStyle(layer, year) {
-            var visibility = (year === '1880') ? visibility1880 : visibility1831;
-            var categories = (year === '1880') ? categories1880 : categories1831;
+            var visibility = (year === '1888') ? visibility1888 : visibility1831;
+            var categories = (year === '1888') ? categories1888 : categories1831;
             layer.setStyle(function(feature) {
-                var fonction = feature.getProperty(year === '1880' ? 'Fonction' : 'use').toLowerCase();
+                var fonction = feature.getProperty(year === '1888' ? 'Fonction' : 'use').toLowerCase();
                 var show = false;
                 var fillColor = 'grey'; // Default color
 
@@ -242,7 +242,7 @@
         }
         
         function toggleFondrenoveVisibility(isVisible) {
-            fondrenove1880Layer.setStyle({visible: isVisible});
+            fondrenove1888Layer.setStyle({visible: isVisible});
         }
 
     </script>
